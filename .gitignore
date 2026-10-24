@@ -5,10 +5,6 @@ __pycache__/
 *.so
 .Python
 
-# Large datasets (download via python download_data.py)
-HiSTGNN/data/
-**/data/
-
 # Model checkpoints and logs
 HiSTGNN/save/
 **/save/
