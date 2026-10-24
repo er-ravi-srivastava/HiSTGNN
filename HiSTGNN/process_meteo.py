@@ -1,7 +1,10 @@
 import click
 import logging
 from pathlib import Path
-import netCDF4 as nc
+try:
+    import netCDF4 as nc
+except ImportError:
+    nc = None
 import pickle as pk
 import pandas as pd
 import datetime

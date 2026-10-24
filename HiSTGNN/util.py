@@ -10,7 +10,10 @@ from process_meteo import obs_range_dic, ruitu_range_dic
 from process_Israel import Israel_range
 from process_USA import USA_range
 import sys
-import h5py
+try:
+    import h5py
+except ImportError:
+    h5py = None
 
 
 def normal_std(x):
@@ -489,7 +492,7 @@ def load_dataset_all(dataset_dir, batch_size, valid_batch_size= None, test_batch
             tmp_list.append(time_in_day)
             data['x_' + category] = np.concatenate(tmp_list, axis=-1)[:, :-9, :, :num_var, :] # [n, time, station, variables, features] feats(hour, value)
             # only the first three variables as label same with WB's KDD
-            data['y_' + category] = np.expand_dims(cat_data['ground_truth'][:, 4:, :, :1], axis=-1) # [samples, 37, 10, 3, 1]
+            data['y_' + category] = np.expand_dims(cat_data['ground_truth'][:, 4:, :, :3], axis=-1) # [samples, 33, 10, 3, 1]
 
         # standardization
         if scale == 'std':

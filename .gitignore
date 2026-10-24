@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Large datasets (download via python download_data.py)
+HiSTGNN/data/
+**/data/
+
+# Model checkpoints and logs
+HiSTGNN/save/
+**/save/
+*.pth
+*.npy
+
+# Environment
+.env
+venv/
+env/
+.conda/
+
+# IDE
+.vscode/
+.idea/

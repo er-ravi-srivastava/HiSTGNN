@@ -83,7 +83,7 @@ def main(runid):
 
     if not os.path.exists(log_dir):
         # if not
-        os.mkdir(log_dir)
+        os.makedirs(log_dir, exist_ok=True)
 
     result_data = log_dir + '/HiSTGNN_HG_{}_DIL_{}_PreA_{}_{}_results.npy'.format(args.hier_true, args.DIL_true,
                                                                                 args.buildA_true, args.data_name)
@@ -102,7 +102,7 @@ def main(runid):
     scaler = dataloader['scaler']
 
     if args.data_name == "BJ":
-        conv_k_size = (1, 9, 1)
+        conv_k_size = (1, 7, 1)
     elif args.data_name == "2k":
         conv_k_size = (1, 6, 1)
     else:
