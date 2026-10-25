@@ -7,9 +7,9 @@ import torch.nn.functional as F
 
 
 class gat(nn.Module):
-    '''
+    r'''
     h'_i = \sigma{\sum_{v_j \in N_{v_i}} \alpha_{ij}*W*h_j}
-    '''
+    r'''
     def __init__(self, in_dim, out_dim, num_heads, concat=True, activation=nn.ELU(), dropout_prob=0.6,
                  add_skip_connection=True, bias=True, log_attention_weights=False):
         super(gat, self).__init__()
@@ -135,9 +135,9 @@ class prop(nn.Module):
 
 
 class mixprop(nn.Module):
-    '''
+    r'''
     this a rnn architecture, can modified by GRU
-    '''
+    r'''
     def __init__(self,c_in,c_out,gdep,dropout,alpha,predA=True):
         super(mixprop, self).__init__()
         if not predA:
@@ -166,9 +166,9 @@ class mixprop(nn.Module):
 
 
 class mixpropA(nn.Module):
-    '''
+    r'''
     this a rnn architecture, can modified by GRU
-    '''
+    r'''
     def __init__(self,c_in,c_out,gdep,dropout,alpha,predA=True):
         super(mixpropA, self).__init__()
         if not predA:
@@ -399,13 +399,13 @@ class dilated_3D(nn.Module):
 
 
 class graph_constructor(nn.Module):
-    '''
+    r'''
     Graph Learning Layer
     nnodes: num of nodes
     k: subgraph_size
     dim: node dimension default 40
     return adjacency matrix is learned from data
-    '''
+    r'''
     def __init__(self, nnodes, k, dim, device, alpha=3, static_feat=None):
         super(graph_constructor, self).__init__()
         self.nnodes = nnodes

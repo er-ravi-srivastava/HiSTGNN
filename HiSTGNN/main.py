@@ -21,10 +21,10 @@ def log_info(file, info):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--device',type=str,default='cuda:0',help='')
-parser.add_argument('--data',type=str,default='../Weather2K/weather2k_dict.h5',help='data path')
-parser.add_argument('--data_name',type=str,default='2k',help='dataset name BJ, Israel, USA, 2k')
-parser.add_argument('--save',type=str,default='./save/2k/',help='save path')
+parser.add_argument('--device',type=str,default='cuda:0' if torch.cuda.is_available() else 'cpu',help='cuda or cpu')
+parser.add_argument('--data',type=str,default=None,help='data path')
+parser.add_argument('--data_name',type=str,default='BJ',help='dataset name BJ, Israel, USA, 2k')
+parser.add_argument('--save',type=str,default=None,help='save path')
 
 parser.add_argument('--hier_true', type=str_to_bool, default=True, help='weather use flat graph')
 parser.add_argument('--DIL_true', type=str_to_bool, default=False, help='weather use Dynamic Interaction learning')
@@ -74,6 +74,50 @@ parser.add_argument('--expid',type=int,default=1,help='experiment id')
 parser.add_argument('--runs',type=int,default=1,help='number of runs')
 
 args = parser.parse_args()
+
+# Auto-configure default hyper-parameters per dataset if not explicitly set
+if args.data_name == "BJ":
+    if args.data is None: args.data = 'data/wfd_BJ'
+    if args.save is None: args.save = './save/BJ/'
+    args.num_var = 9
+    args.var_nodes = 9
+    args.stat_nodes = 10
+    args.var_node_dim = 20
+    args.stat_node_dim = 20
+    args.seq_in_len = 28
+    args.seq_out_len = 33
+    args.tanhalpha = 3.0
+    args.layers = 3
+elif args.data_name == "Israel":
+    if args.data is None: args.data = 'data/wfd_Israel'
+    if args.save is None: args.save = './save/Israel/'
+    args.num_var = 4
+    args.var_nodes = 4
+    args.stat_nodes = 6
+    args.var_node_dim = 5
+    args.stat_node_dim = 10
+    args.seq_in_len = 48
+    args.seq_out_len = 24
+    args.in_dim = 1
+    args.tanhalpha = 2.0
+    args.layers = 2
+elif args.data_name == "USA":
+    if args.data is None: args.data = 'data/wfd_USA'
+    if args.save is None: args.save = './save/USA/'
+    args.num_var = 4
+    args.var_nodes = 4
+    args.stat_nodes = 13
+    args.var_node_dim = 5
+    args.stat_node_dim = 10
+    args.seq_in_len = 48
+    args.seq_out_len = 24
+    args.in_dim = 2
+    args.tanhalpha = 2.0
+    args.patient = 5
+    args.layers = 2
+elif args.data is None:
+    args.data = '../Weather2K/weather2k_dict.h5'
+    if args.save is None: args.save = './save/2k/'
 torch.set_num_threads(3)
 
                                      
