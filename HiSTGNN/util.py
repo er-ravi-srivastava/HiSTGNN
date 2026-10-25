@@ -607,7 +607,8 @@ def new_load_Israel_dataset(dataset_dir, batch_size, valid_batch_size= None, tes
     data includes [n_sample, stations, variable, features]
     '''
     # data['x_train'] data['y_train']
-    ori_data = load_pkl(dataset_dir, 'new_Israel_data.dict')
+    fname = 'new_Israel_data.dict' if os.path.exists(os.path.join(dataset_dir, 'new_Israel_data.dict')) else 'Israel_data.dict'
+    ori_data = load_pkl(dataset_dir, fname)
     data = {}
     for category in ['train', 'val', 'test']:
         tmp = ori_data['x_' + category]

@@ -7,13 +7,25 @@ This repository contains the PyTorch implementation and reproduction package for
 
 ---
 
-## 📊 Benchmark Results (Table 3: WD_BJ Performance)
+## 📊 Benchmark Datasets & Results
+
+### 1. WD_BJ (Beijing Weather Dataset - Table 3)
+* **Configuration:** 10 Stations, 9 Observed Variables $\rightarrow$ 3 Target Variables (`TEMP`, `HUM`, `WIND`)
+* **Time Windows:** 28 historical timesteps (28h) $\rightarrow$ 33 forecast timesteps (33h)
 
 | Methods | Metrics | TEMP | HUM | WIND | Avg. |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **HiSTGNN (Paper)** | **MAE** | **1.9533** | **9.8089** | **0.8671** | **4.2098** |
 | | **RMSE** | **2.6353** | **14.0129** | **1.2634** | **5.9705** |
 | | **MAPE (%)** | **32.49%** | **23.80%** | **52.40%** | **36.23%** |
+
+### 2. WD_Israel (Table 4)
+* **Configuration:** 6 Stations, 4 Variables (`TEMP`, `HUM`, `WIND`, `PRESSURE`)
+* **Time Windows:** 48 historical timesteps (48h) $\rightarrow$ 24 forecast timesteps (24h)
+
+### 3. WD_USA (Table 5)
+* **Configuration:** 13 Stations, 4 Variables (`TEMP`, `HUM`, `WIND`, `PRESSURE`)
+* **Time Windows:** 48 historical timesteps (48h) $\rightarrow$ 24 forecast timesteps (24h)
 
 ---
 
@@ -24,21 +36,28 @@ This repository contains the PyTorch implementation and reproduction package for
 conda create --name histgnn python=3.10 -y
 conda activate histgnn
 
-# Install PyTorch (CUDA or CPU)
+# Install PyTorch with CUDA support (or CPU)
 pip install torch torchvision
 
-# Dependencies
+# Core scientific packages
 pip install numpy scipy pandas scikit-learn matplotlib
 ```
 
-### 2. Download Dataset
-Run the included download script to automatically fetch `test.dict`, `val.dict`, and `train.dict` from the author's public Google Drive storage directly into `HiSTGNN/data/wfd_BJ`:
+### 2. Automated Dataset Downloader
+Download all three datasets (or specific ones) with a single command from the official Google Drive archive:
 ```bash
-python HiSTGNN/download_data.py
+# Download ALL 3 datasets (BJ, Israel, USA)
+python HiSTGNN/download_data.py --dataset all
+
+# Or individually:
+# python HiSTGNN/download_data.py --dataset bj
+# python HiSTGNN/download_data.py --dataset israel
+# python HiSTGNN/download_data.py --dataset usa
 ```
 
-### 3. Reproduce Table 3 Results
-To train the model on the `wfd_BJ` dataset and evaluate test performance:
+### 3. Running Reproduction for All 3 Datasets
+
+#### A. Beijing Dataset (`wfd_BJ`)
 ```bash
 cd HiSTGNN
 python main.py \
@@ -61,15 +80,67 @@ python main.py \
   --learning_rate 0.001 \
   --seed 101
 ```
-*(On CPU-only machines, use `--device cpu`).*
+
+#### B. Israel Dataset (`wfd_Israel`)
+```bash
+cd HiSTGNN
+python main.py \
+  --device cuda:0 \
+  --in_dim 1 \
+  --epochs 100 \
+  --layers 2 \
+  --data data/wfd_Israel \
+  --data_name Israel \
+  --save ./save/Israel/ \
+  --gcn_depth 2 \
+  --num_var 4 \
+  --var_nodes 4 \
+  --stat_nodes 6 \
+  --var_node_dim 5 \
+  --stat_node_dim 10 \
+  --seq_in_len 48 \
+  --seq_out_len 24 \
+  --batch_size 32 \
+  --tanhalpha 2 \
+  --learning_rate 0.001 \
+  --seed 101
+```
+
+#### C. USA Dataset (`wfd_USA`)
+```bash
+cd HiSTGNN
+python main.py \
+  --device cuda:0 \
+  --in_dim 2 \
+  --epochs 100 \
+  --layers 2 \
+  --data data/wfd_USA \
+  --data_name USA \
+  --save ./save/USA/ \
+  --gcn_depth 2 \
+  --num_var 4 \
+  --var_nodes 4 \
+  --stat_nodes 13 \
+  --var_node_dim 5 \
+  --stat_node_dim 10 \
+  --seq_in_len 48 \
+  --seq_out_len 24 \
+  --batch_size 16 \
+  --tanhalpha 2 \
+  --patient 5 \
+  --learning_rate 0.001 \
+  --seed 101
+```
+*(For CPU-only testing on any dataset, replace `--device cuda:0` with `--device cpu` and adjust batch size).*
 
 ---
 
-## 🛠️ Reproduction Fixes Applied
-1. **Target Variable Slicing (`util.py`)**: Fixed ground truth indexing from `:1` to `:3` to evaluate all three target metrics (`TEMP`, `HUM`, `WIND`) reported in Table 3.
-2. **Output Kernel Size (`main.py`)**: Corrected output convolution kernel dimension `conv_k_size = (1, 7, 1)` to match `3` prediction heads instead of collapsing to `1`.
-3. **Graceful Imports (`process_meteo.py`, `util.py`)**: Guarded optional libraries (`netCDF4`, `h5py`) to prevent import crashes during benchmark reproduction.
-4. **Automated Data Downloader (`download_data.py`)**: Added direct 1-click Google Drive fetcher for seamless reproduction.
+## 🛠️ Key Bug Fixes Applied for Reproduction
+1. **Target Variable Slicing (`util.py`)**: Fixed `wfd_BJ` label slicing from `:1` to `:3` so that all 3 target variables (`TEMP`, `HUM`, `WIND`) are computed and matched to Table 3.
+2. **Convolution Kernel Projection (`main.py`)**: Corrected output convolution kernel dimension `conv_k_size = (1, 7, 1)` for `wfd_BJ` to properly project 9 variables to 3 target heads.
+3. **Israel Dataset Loader Robustness (`util.py`)**: Added adaptive file discovery for `Israel_data.dict` vs `new_Israel_data.dict` to prevent `FileNotFoundError`.
+4. **Library Import Guards (`process_meteo.py`, `util.py`)**: Protected optional dependencies (`netCDF4`, `h5py`) so standard environments don't crash on import.
+5. **Unified Multi-Dataset Downloader (`download_data.py`)**: Automated downloading for all 3 datasets directly from Google Drive.
 
 ---
 
